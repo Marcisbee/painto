@@ -1,4 +1,10 @@
-export default function Framework(canvas, keys, userState, actions, render) {
+let globalCtx;
+
+function object(fn) {
+  return fn.bind(globalCtx);
+}
+
+function canvas(canvas, keys, userState, actions, render) {
   function resizeGame() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -8,14 +14,9 @@ export default function Framework(canvas, keys, userState, actions, render) {
   resizeGame();
 
   let ctx = canvas.getContext('2d');
+  globalCtx = ctx;
   let lastState = '';
   const state = {
-    player: {
-      position: {
-        x: 95,
-        y: 50,
-      },
-    },
     userState,
     pressed: [],
   };
@@ -43,7 +44,7 @@ export default function Framework(canvas, keys, userState, actions, render) {
     }
   }
   window.addEventListener('keyup', keyup, false);
-  window.addEventListener('keyup', keydown, false);
+  window.addEventListener('keydown', keydown, false);
 
   function handleActions(pressed) {
     for (let index = 0; index < pressed.length; index++) {
@@ -64,11 +65,16 @@ export default function Framework(canvas, keys, userState, actions, render) {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      render(ctx, keysPressedMap);
+      render(keysPressedMap);
 
       tick();
     });
   }
 
   return tick();
+}
+
+export default {
+  canvas,
+  object,
 }
